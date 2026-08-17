@@ -3,6 +3,8 @@ set -euo pipefail
 
 ACCOUNT_ID="235494777438"
 REPO="carlosEA28/Text-To-Speach-CLI"
+OWNER="${REPO%/*}"
+REPO_NAME="${REPO#*/}"
 ROLE_NAME="github-actions-deploy"
 OIDC_ARN="arn:aws:iam::${ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,7 +46,7 @@ cat > "$TRUST_POLICY" <<EOF
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
         },
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:${REPO}:*"
+          "token.actions.githubusercontent.com:sub": "repo:${OWNER}*/${REPO_NAME}*:*"
         }
       }
     }
