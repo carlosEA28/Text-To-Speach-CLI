@@ -34,12 +34,6 @@ jobs:
         with:
           terraform_version: "1.9"
 
-      - name: Debug OIDC claims
-        run: |
-          token=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
-          echo "token: ${token:0:40}..."
-          echo "$token" | python3 -c "import sys,json,base64; t=sys.stdin.read().strip().split('.')[1]; t+='='*(-len(t)%4); print(json.dumps(json.loads(base64.urlsafe_b64decode(t)), indent=2))"
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
