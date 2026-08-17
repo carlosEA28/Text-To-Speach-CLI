@@ -1,0 +1,23 @@
+{
+  "name": "tts-polly",
+  "version": "1.0.0",
+  "description": "Conversor de texto para fala com AWS Lambda + Polly e CLI openTUI",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "scripts": {
+    "start": "NODE_OPTIONS=--experimental-ffi tsx cli/cli.tsx",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-polly": "^3.600.0",
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@opentui/core": "^0.5.3",
+    "@opentui/react": "^0.5.3",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

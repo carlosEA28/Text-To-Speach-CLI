@@ -1,0 +1,13 @@
+node_modules/
+output.mp3
+
+# Terraform
+infra/.terraform/
+infra/lambda_function.zip
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+infra/*.tfvars
+
+# AWS CLI
+.aws/

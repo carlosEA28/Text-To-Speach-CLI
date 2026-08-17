@@ -1,0 +1,41 @@
+name: Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Digite "destroy" para confirmar a destruição da infraestrutura'
+        required: true
+        default: "nao"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  destroy:
+    name: Terraform destroy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9"
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: sa-east-1
+
+      - name: Confirmar destruição
+        if: github.event.inputs.confirm != 'destroy'
+        run: |
+          echo "⛔ Abortado. Você deve digitar 'destroy' no input 'confirm'."
+          exit 1
+
+      - name: Terraform init
+        run: terraform init
+        working-directory: infra
+
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve -input=false
+        working-directory: infra
