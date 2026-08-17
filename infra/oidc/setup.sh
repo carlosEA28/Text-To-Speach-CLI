@@ -8,13 +8,13 @@ OIDC_ARN="arn:aws:iam::${ACCOUNT_ID}:oidc-provider/token.actions.githubuserconte
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "==> 1/4 Provider OIDC"
-THUMBPRINT="6938fd4d98bab03faadb97b34396831e3780aea1"
+THUMBPRINTS="227203b5317f3818cab5b5ce596132bf36748c0e 2d74d6dfd96eea55ad7baafa0d3c6552b2dadc37 ab9d0263244dd0326eb67015705a667e79cfe998"
 if aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$OIDC_ARN" >/dev/null 2>&1; then
   CURRENT="$(aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$OIDC_ARN" --query 'ThumbprintList' --output text)"
-  if [[ "$CURRENT" != *"$THUMBPRINT"* ]]; then
+  if [[ "$CURRENT" != *"227203b5317f3818cab5b5ce596132bf36748c0e"* ]]; then
     aws iam update-open-id-connect-provider-thumbprint \
       --open-id-connect-provider-arn "$OIDC_ARN" \
-      --thumbprint-list "$THUMBPRINT"
+      --thumbprint-list $THUMBPRINTS
     echo "    Thumbprint atualizado para o certificado atual do GitHub."
   else
     echo "    Já existe e com thumbprint atual."
@@ -23,7 +23,7 @@ else
   aws iam create-open-id-connect-provider \
     --url https://token.actions.githubusercontent.com \
     --client-id-list sts.amazonaws.com \
-    --thumbprint-list "$THUMBPRINT"
+    --thumbprint-list $THUMBPRINTS
   echo "    Criado."
 fi
 
@@ -41,8 +41,10 @@ cat > "$TRUST_POLICY" <<EOF
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringEquals": {
-          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": "repo:${REPO}:ref:refs/heads/main"
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:${REPO}:*"
         }
       }
     }
