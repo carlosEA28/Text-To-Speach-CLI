@@ -106,20 +106,18 @@ O workflow `.github/workflows/ci.yml`:
 - **push/PR** → `npm test` + `terraform plan`.
 - **push na `main`** → `terraform apply`.
 
-### Setup do GitHub
+### Setup do GitHub (OIDC)
 
-1. Crie um **OIDC provider** do GitHub na AWS (IAM → Identity providers):
+Existe um script pronto que cria tudo (provider, role e policy):
 
 ```bash
-aws iam create-open-id-connect-provider \
-  --url https://token.actions.githubusercontent.com \
-  --client-id-list sts.amazonaws.com \
-  --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1
+AWS_PROFILE=AdministratorAccess-235494777438 bash infra/oidc/setup.sh
 ```
 
-2. Crie uma **role** de deploy com trust policy para o seu repo, que a Lambda possa assumir
-   (permissões de `terraform`/S3/API Gateway/Lambda/CloudWatch). Anote o ARN.
-3. No GitHub, adicione o secret **`AWS_ROLE_TO_ASSUME`** com esse ARN.
+Ele imprime o **ARN da role** no final. Depois, no GitHub (repo → Settings → Secrets and variables → Actions), crie o secret **`AWS_ROLE_TO_ASSUME`** com esse ARN.
+
+> O trust policy limita o acesso ao seu repo na branch `main` (`repo:carlosEA28/Text-To-Speach-CLI:ref:refs/heads/main`).
+> Alternativa manual: criar o provider OIDC + role conforme os arquivos em `infra/oidc/`.
 
 > Alternativa sem OIDC: usar `secrets.AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`
 > (troque o passo de credenciais no workflow).

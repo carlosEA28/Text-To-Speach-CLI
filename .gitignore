@@ -8,6 +8,7 @@ infra/lambda_function.zip
 *.tfstate.*
 terraform.tfvars
 infra/*.tfvars
+infra/oidc/trust-policy.json
 
 # AWS CLI
 .aws/
